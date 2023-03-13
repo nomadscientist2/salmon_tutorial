@@ -1,0 +1,45 @@
+[2023-03-12 14:25:50.849] [jointLog] [info] Fragment incompatibility prior below threshold.  Incompatible fragments will be ignored.
+[2023-03-12 14:25:50.849] [jointLog] [warning] 
+
+NOTE: It appears you are running salmon without the `--validateMappings` option.
+Mapping validation can generally improve both the sensitivity and specificity of mapping,
+with only a moderate increase in use of computational resources. 
+Mapping validation is planned to become a default option (i.e. turned on by default) in
+the next release of salmon.
+Unless there is a specific reason to do this (e.g. testing on clean simulated data),
+`--validateMappings` is generally recommended.
+
+[2023-03-12 14:25:50.849] [jointLog] [info] parsing read library format
+[2023-03-12 14:25:50.849] [jointLog] [info] There is 1 library.
+[2023-03-12 14:25:50.911] [jointLog] [info] Loading Quasi index
+[2023-03-12 14:25:50.911] [jointLog] [info] Loading 32-bit quasi index
+[2023-03-12 14:25:51.031] [jointLog] [info] done
+[2023-03-12 14:25:51.031] [jointLog] [info] Index contained 4,535 targets
+[2023-03-12 14:25:51.220] [jointLog] [info] Automatically detected most likely library type as IU
+[2023-03-12 14:25:51.742] [jointLog] [info] Computed 5,561 rich equivalence classes for further processing
+[2023-03-12 14:25:51.742] [jointLog] [info] Counted 193,505 total reads in the equivalence classes 
+[2023-03-12 14:25:51.749] [jointLog] [info] Number of fragments discarded because they have only dovetail (discordant) mappings : 576
+[2023-03-12 14:25:51.750] [jointLog] [warning] Only 193505 fragments were mapped, but the number of burn-in fragments was set to 5000000.
+The effective lengths have been computed using the observed mappings.
+
+[2023-03-12 14:25:51.750] [jointLog] [info] Mapping rate = 85.0975%
+
+[2023-03-12 14:25:51.750] [jointLog] [info] finished quantifyLibrary()
+[2023-03-12 14:25:51.750] [jointLog] [info] Starting optimizer
+[2023-03-12 14:25:51.753] [jointLog] [info] Marked 0 weighted equivalence classes as degenerate
+[2023-03-12 14:25:51.754] [jointLog] [info] iteration = 0 | max rel diff. = 2876.66
+[2023-03-12 14:25:51.772] [jointLog] [info] iteration = 100 | max rel diff. = 1.08018
+[2023-03-12 14:25:51.789] [jointLog] [info] iteration = 200 | max rel diff. = 0.044132
+[2023-03-12 14:25:51.793] [jointLog] [info] iteration = 224 | max rel diff. = 0.00591337
+[2023-03-12 14:25:51.793] [jointLog] [info] Finished optimizer
+[2023-03-12 14:25:51.793] [jointLog] [info] writing output 
+
+[2023-03-12 14:25:51.800] [jointLog] [warning] NOTE: Read Lib [[ UHR_Rep1_R1.fastq.gz, UHR_Rep1_R2.fastq.gz]] :
+
+Detected a *potential* strand bias > 1% in an unstranded protocol check the file: ../quant/UHR_Rep1/lib_format_counts.json for details
+
+[2023-03-12 14:25:51.742] [fileLog] [info] 
+At end of round 0
+==================
+Observed 227392 total fragments (227392 in most recent round)
+

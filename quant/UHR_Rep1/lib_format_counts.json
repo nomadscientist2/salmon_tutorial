@@ -1,0 +1,25 @@
+{
+    "read_files": [
+        "UHR_Rep1_R1.fastq.gz",
+        "UHR_Rep1_R2.fastq.gz"
+    ],
+    "expected_format": "IU",
+    "compatible_fragment_ratio": 1.0,
+    "num_compatible_fragments": 193505,
+    "num_assigned_fragments": 193505,
+    "num_frags_with_concordant_consistent_mappings": 190412,
+    "num_frags_with_inconsistent_or_orphan_mappings": 3434,
+    "strand_mapping_bias": 0.8066613448732223,
+    "MSF": 0,
+    "OSF": 0,
+    "ISF": 36814,
+    "MSR": 0,
+    "OSR": 0,
+    "ISR": 153598,
+    "SF": 1722,
+    "SR": 1712,
+    "MU": 0,
+    "OU": 0,
+    "IU": 0,
+    "U": 0
+}

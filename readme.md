@@ -1,0 +1,1 @@
+Based on the Salmon data tutorial provided at https://www.hadriengourle.com/tutorials/rna/

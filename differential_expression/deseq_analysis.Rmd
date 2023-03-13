@@ -1,0 +1,181 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Import libraries.
+
+```{r}
+library(tximport)
+library(GenomicFeatures)
+library(readr)
+```
+
+Create a conversion from transcripts to gene so that we can evaluate gene expression differences.
+
+```{r}
+txdb <- makeTxDbFromGFF("../data/chr22_genes.gtf")
+k <- keys(txdb, keytype = "TXNAME")
+tx2gene <- select(txdb, keys = k, "GENEID", "TXNAME")
+print(tx2gene)
+```
+
+Read in the experimental design matrix to a dataframe.  Check the output df.
+
+```{r}
+samples <- read.table("../data/samples.txt", header = TRUE)
+print(samples)
+```
+
+Create and store the file path names to be analyzed.  Check a sample output.
+
+```{r}
+files <- file.path("../quant", samples$sample, "quant.sf")
+print(files[1])
+```
+
+Attach the sample name to each of the quant.sf file names.
+
+```{r}
+names(files) <- paste0(samples$sample)
+print(files["HBR_Rep1"])
+all(file.exists(files))
+```
+
+Next we'll analyze the data at the gene level using our tx2gene object to convert form transcripts to gene-level data.
+
+```{r}
+txi.salmon <- tximport(files, type = "salmon", tx2gene = tx2gene)
+
+head(txi.salmon$counts)
+```
+```{r}
+library(DESeq2)
+```
+
+Then we will create our DDS object. We'll also check the number of reads in each sample.
+
+```{r}
+dds <- DESeqDataSetFromTximport(txi.salmon, samples, ~condition)
+dds <- DESeq(dds)
+colSums(counts(dds))
+```
+
+Next we'll remove any rows that have less than 10 read counts in total.
+
+```{r}
+keep <- rowSums(counts(dds)) >= 10
+dds <- dds[keep,]
+res <- results(dds)
+summary(res)
+```
+
+Next check the dispersion plot.  As counts increase, there should be a decrease to plateau in the dispersion.
+
+```{r}
+plotDispEsts(dds, main="Dispersion plot")
+```
+We need to log transform the count data for doing clustering and heatmaps.  We use the rlog function as follows.
+
+```{r}
+rld <- rlogTransformation(dds)
+head(assay(rld))
+```
+
+The rld object is then used for clustering and generating a heatmap.
+
+```{r}
+
+#need to replace this code with ggplot2 plots! gplots is deprecated.
+
+library(RColorBrewer)
+library(gplots)
+
+(mycols <- brewer.pal(8, "Dark2")[1:length(unique(samples$condition))])
+sampleDists <- as.matrix(dist(t(assay(rld))))
+heatmap.2(as.matrix(sampleDists), key=F, trace="none",
+          col=colorpanel(100, "black", "white"),
+          ColSideColors=mycols[samples$condition],
+          RowSideColors=mycols[samples$condition],
+          margin=c(10, 10), main="Sample Distance Matrix")
+```
+Make a PCA plot.  The HBR and UHR samples should cluster together, respectively.  Such clustering indicates there are PCA variables (linear combinations of the existing gene variables) that are able to well-separate the samples based on their origins (which we would expect!).  Again, note that we use the log transformed data for PCA analysis.
+
+```{r}
+plotPCA(rld, intgroup="condition")
+```
+Check the p-values:
+
+```{r}
+table(res$padj<0.05)
+res <- res[order(res$padj), ]
+resdata <- merge(as.data.frame(res), as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
+names(resdata)[1] <- "Gene"
+head(resdata)
+```
+Plot the adjusted p-values as a histogram:
+
+```{r}
+hist(res$padj, breaks=50, col="grey")
+```
+
+Make an MA plot:
+
+```{r}
+plotMA(res, ylim=c(-10,10))
+```
+Make a volcano plot:
+
+```{r}
+with(res, plot(log2FoldChange, -log10(pvalue), pch=20, main="Volcano plot", xlim=c(-10,10), ylim=c(0,20)))
+with(subset(res, padj<.01 ), points(log2FoldChange, -log10(pvalue), pch=20, col="red"))
+```
+Making a volcano plot using the EnhancedVolcano library.
+
+```{r}
+library(EnhancedVolcano)
+
+  EnhancedVolcano(res,
+    lab = rownames(res),
+    x = 'log2FoldChange',
+    y = 'pvalue',
+    title = 'Volcano',
+    pCutoff = 10e-4,
+    FCcutoff = 2,
+    pointSize = 2.0,
+    labSize = 2.0,
+    col=c('black', 'black', 'black', 'red3'),
+    colAlpha = 1)
+```
+Making a volcano plot with ggplot2.
+
+```{r}
+
+library(tidyverse)
+
+# Create MA plot
+plotMA(res)
+
+# Generate logical column 
+res_all <- data.frame(res) %>% mutate(threshold = padj < 0.01)
+              
+# Create the volcano plot
+ggplot(res_all) + 
+        geom_point(aes(x = log2FoldChange, y = -log10(padj), color = threshold)) + 
+        xlab("log2 fold change") + 
+        ylab("-log10 adjusted p-value") + 
+        theme(legend.position = "none", 
+              plot.title = element_text(size = rel(1.5), hjust = 0.5), 
+              axis.title = element_text(size = rel(1.25)))
+```
+```{r}
+plotCounts(dds, gene=which.min(res$padj), intgroup="condition")
+```
+```{r}
+resOrdered <- res[order(res$pvalue),]
+
+write.csv(as.data.frame(resOrdered), 
+          file="condition_treated_results.csv")
+
+```
+

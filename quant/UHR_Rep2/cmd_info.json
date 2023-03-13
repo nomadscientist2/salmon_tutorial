@@ -1,0 +1,9 @@
+{
+    "salmon_version": "0.14.1",
+    "index": "chr22_index",
+    "libType": "A",
+    "mates1": "UHR_Rep2_R1.fastq.gz",
+    "mates2": "UHR_Rep2_R2.fastq.gz",
+    "output": "../quant/UHR_Rep2",
+    "auxDir": "aux_info"
+}
